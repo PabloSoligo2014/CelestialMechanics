@@ -72,6 +72,10 @@ def ej2():
     
     print("vfinal: ", vfinal) #Da bien...
     
+    #Cambio de inclinacion en el apageo
+    
+    
+    
     
 
 
