@@ -87,20 +87,22 @@ if __name__ == '__main__':
     
     sv = np.array([42164.0, 0.0, 0.0, 0.0, 1.5, 0.0])
     
-    p = Propagator.create(sv, 1)
+    p = Propagator.create(sv, 100)
     
     p.RK4(94000)
     
     
     p.plot()
     #pass
+    
+    """
     ej1()
     print("---------------------------------------------")
     print("Ejercicio 2")
     print("---------------------------------------------")
     ej2()
     
-    
+    """
    
     
     

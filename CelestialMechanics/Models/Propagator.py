@@ -27,7 +27,7 @@ class Propagator(object):
         """
         result = cls()
         
-        cls.GM = 398600.448
+        cls.mu = 398600.448
         cls.stateVectors = []
         
         result.h = h
@@ -50,7 +50,7 @@ class Propagator(object):
             z.append(e[2])
 
         plt.title("Orbita RK")
-        plt.plot(x, z)
+        plt.plot(x, y)
         plt.show()
         
         
@@ -58,23 +58,29 @@ class Propagator(object):
         
         mod = np.linalg.norm(stateVector); 
         
+        #Paso derivo la posicion y me da velocidad
+        #Derivo la velocidad y me da aceleracion
+        coeff = -(self.mu)/(mod**3)
+        result = np.array([ stateVector[3],
+                            stateVector[4],
+                            stateVector[5],
+                            stateVector[0]*coeff,
+                            stateVector[1]*coeff,
+                            stateVector[2]*coeff,
+                           ]) 
         
-        coeff = -(self.GM)/mod**3
-        stateVector[0] = stateVector[3]
-        stateVector[1] = stateVector[4]
-        stateVector[2] = stateVector[5]
-        stateVector[3] = stateVector[0]*coeff
-        stateVector[4] = stateVector[1]*coeff
-        stateVector[5] = stateVector[2]*coeff
+
         
-        return stateVector;
+        return result;
+    
+    
         
     def RK4(self, time):
         """
         RK4 hardcodeando las 4 derivaciones, sin uso de bucle
         """
         
-        yant = self.stateVector;
+        yant     = self.stateVector;
         for t in range(0, time, self.h):
             
             y0 = yant
@@ -86,111 +92,13 @@ class Propagator(object):
             y2 = y0 + (0.5*self.h)*k1
             k2 = self.__deriv(y2)
             
-            y3 = y0 + (0.5*self.h)*k2
+            y3 = y0 + (self.h)*k2
             k3 = self.__deriv(y3)
             
-            yfinal =  y0 + (self.h/6.0)*(k0+ k1*2 + k2*2 + k3);
+            yfinal =  y0 + (1/6.0)*(k0+ k1*2 + k2*2 + k3)*self.h;
 
             self.stateVectors.append(yfinal)
             yant = yfinal;
             
         
-                   
-        
-        
-                
-        
-        """       
-        _matrix _propagators::f_rk (double t, _matrix y) {
-
-    _matrix m (N_ELEM_VECTOR, 1);
-    double d;
-    const double GM = 398600.448;
-    double d3;
-    _vector3d a_man;
-
-    m [0][0] = y [3][0];
-    m [1][0] = y [4][0];
-    m [2][0] = y [5][0];
-    d = sqrt (y [0][0] * y [0][0] + y [1][0] * y [1][0] + y [2][0] * y [2][0]);
-    d3 = d * d * d;
-    m [3][0] = - GM * y [0][0] / d3;
-    m [4][0] = - GM * y [1][0] / d3;
-    m [5][0] = - GM * y [2][0] / d3;
-    m [6][0] = 0;
-
-
-
-    if (mans.current != NULL){
-        if ((t >= mans.current->mjd) && (t < (mans.current->mjd + mans.current->duration / 86400.0))){
-            a_man = mans.current->dv * mans.current->thrust / y [6][0];
-            m [6][0] = mans.current->flow_rate;
-            m [3][0] = m [3][0] + a_man.x;
-            m [4][0] = m [4][0] + a_man.y;
-            m [5][0] = m [5][0] + a_man.z;
-            }
-        }
-    return (m);
-    }
-    
-    void _propagators::rk4 (_geoscx_time _t0, _cartesian c0, double h, _geoscx_time _tf)
-    {
-    double t;
-    const int order = 4;
-    _matrix yprima (6, 1);
-    _matrix y (N_ELEM_VECTOR, 1), ymasuno (N_ELEM_VECTOR, 1);
-    _matrix k (N_ELEM_VECTOR, order);
-    _matrix yn (N_ELEM_VECTOR, order);
-    _matrix tn (order, 1), f (N_ELEM_VECTOR, 1);
-    _svec *p;
-    int i, j, tt;
-
-    y0.mjd = _t0.mjd ();
-    y0.c = c0;
-    y0.mass = mass;
-    tf = _tf;
-    reset ();
-
-    y = y0.matrix ();
-    p = new _svec (y);
-    p->mjd = y0.mjd;
-    add (p);
-
-    for (t = y0.mjd; (t < tf.mjd ()); t += h / 86400.0)
-        {
-        // compute tn,i
-        for (i = 0; (i < order); i ++)
-            tn [i][0] = t + h / 86400.0 * tableau_rk4 [i][0];
-
-
-        yn.clear ();
-        // compute yn,i
-        for (i = 0; (i < order); i ++) {
-            for (tt = 0; (tt < N_ELEM_VECTOR); tt ++)
-                yn [tt][i] = y [tt][0];
-
-            for (j = 0; (j < order); j ++){
-
-                if (tableau_rk4 [i][j + 1] != 0){
-                    f = f_rk (tn [j][0], yn.column (j)) * h * tableau_rk4 [i][j + 1];
-                    for (tt = 0; (tt < N_ELEM_VECTOR); tt ++)
-                        yn [tt][i] = yn [tt][i] + f [tt][0];
-                }
-            }
-
-        }
-    // compute ymasuno
-
-        ymasuno = y;
-        for (i = 0; (i < order); i ++){
-            ymasuno = ymasuno + f_euler (tn [i][0], yn.column (i)) * h * tableau_rk4 [order][i];
-        }
-
-        p = new _svec (ymasuno);
-        p->mjd = t + h / 86400.0;
-        add (p);
-        y = ymasuno;
-    }
-    pack ();
-}
-"""
+         
