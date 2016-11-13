@@ -89,7 +89,8 @@ if __name__ == '__main__':
     
     p = Propagator.create(sv, 100)
     
-    p.RK4(94000)
+    #p.RK4(94000)
+    p.RKN(94000, 4)
     
     
     p.plot()

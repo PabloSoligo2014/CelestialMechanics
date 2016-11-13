@@ -32,7 +32,21 @@ class Propagator(object):
         
         result.h = h
         result.stateVector = stateVector
+        
+        
+        result.tableau_rk4 = np.array( [
+                                    [0,   0,   0,   0,   0],
+                                    [0.5, 0.5, 0,   0,   0],
+                                    [0.5,  0,   0.5, 0,   0],
+                                    [1,    0,   0,   1,   0],
+                                    [1.0/6.0, 1.0/3.0, 1.0/3.0, 1.0/6.0, 0]
+                                    ]
+                                    )
+        
+        
         return result
+    
+    
     
     def plot(self):
         x = []
@@ -74,6 +88,46 @@ class Propagator(object):
         return result;
     
     
+    
+    def RKN(self, time, n):
+        """
+        RK4 hardcodeando las 4 derivaciones, sin uso de bucle
+        """
+        
+       
+        yant     = self.stateVector;
+        for t in range(0, time, self.h):
+            
+            
+            kimenosuno = self.__deriv(yant)
+            
+            yis = []
+            kis = []
+            
+            for i in range(0, n):
+                mult = self.tableau_rk4[i,i]
+                yi = yant + (mult*self.h)*kimenosuno
+                ki = self.__deriv(yi)
+                
+                #Se podria hacer todo en un paso pero por apredizaje
+                #y debug se abre
+                kis.append(ki)
+                yis.append(yi)
+                
+                kimenosuno = ki
+                
+            ysum = [0,0,0,0,0,0]
+            
+            #ymasuno = ymasuno + f_euler (tn [i][0], yn.column (i)) * h * tableau_rk4 [order][i];
+            for i in range(0, n):
+                ysum =  ysum + self.tableau_rk4[n,i]*kis[i]
+
+            yfinal =  yant + self.h*ysum
+            
+            self.stateVectors.append(yfinal)
+            
+            yant = yfinal;
+        
         
     def RK4(self, time):
         """
