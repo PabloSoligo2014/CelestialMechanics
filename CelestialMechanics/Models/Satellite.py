@@ -7,8 +7,12 @@ Created on 24 de oct. de 2016
 import math
 import numpy as np
 
-mu = 398600
-earthRadius = 6378
+#3.986004418(9)×10**14
+
+mu = 398600.0
+earthRadius = 6378.0
+
+#$ pip install orbitalpy
 
 
 class Satellite(object):
@@ -23,15 +27,24 @@ class Satellite(object):
     apogeeDistance = 0
     perigeeDistance = 0
     vh = 0
-    vk = np.array([0, 0, 1])
+
     
-    def __init__(self, pd, ad):
+    
+    def __init__(self, *args, **kwargs):
         '''
         Constructor
         '''
-        self.apogeeDistance = ad
-        self.perigeeDistance = pd
         
+        #super(MyForm, self).__init__(*args, **kwargs)
+        
+        
+        if 'ap' in kwargs:
+            self.apogeeDistance = kwargs.pop('ap')
+            
+        if 'ad' in kwargs:
+            self.perigeeDistance = kwargs.pop('pd')
+        
+         
         
         self.versor_i = np.array([1,0,0]) 
         self.versor_j = np.array([0,1,0])
@@ -52,11 +65,11 @@ class Satellite(object):
         
         #Fuente 
         #http://space.stackexchange.com/questions/1904/how-to-programmatically-calculate-orbital-elements-using-position-velocity-vecto
-        
+        #http://trajectory.estec.esa.int/Astro/4rth-astro-workshop-presentations/ICATT-2010-Tutorial-ASTRODYNAMICS.pdf
         self.vr = np.array([ri, rj, rk])#Vector posicion
         self.vv = np.array([vi, vj, vk])#Vector velocidad
         self.vh = self.vr*self.vv
-        self.vn = self.vk*self.vh
+        self.vn = self.versor_k*self.vh
         self.n = np.linalg.norm(self.vn)
         
         #self.ve = ((self.vv*self.vh)/mu)-(self.vr/self.getRModule())
@@ -74,7 +87,7 @@ class Satellite(object):
         self.energy = (self.v**2/2) - (mu/self.r)
         
         #solo para self.e != 1
-        self.a = -mu/2*self.energy
+        self.a =  (-mu/self.energy)/2
         
         self.i = np.arccos(np.dot(self.vh,self.versor_k)/self.h)
         self.raan = np.arccos(np.dot(self.vn,self.versor_i)/self.n)
