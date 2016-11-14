@@ -1,3 +1,5 @@
+ #!/usr/bin/python
+ # -*- coding:UTF-8 -*-
 '''
 Created on 12 de nov. de 2016
 
@@ -43,6 +45,18 @@ class Propagator(object):
                                     ]
                                     )
         
+        result.tableau_rkf45 = np.array([
+                    		[0,   0,   0,   0,   0, 0, 0, 0],
+                    		[1.0 / 4.0, 1.0 / 4.0, 0,   0,   0, 0, 0, 0],
+                    		[3.0 / 8.0,  3.0 / 32.0,   9.0 / 32.0, 0,   0, 0, 0, 0],
+                    		[12.0 / 13.0,  1932.0 / 2197.0,   -7200.0 / 2197.0,   7296.0 / 2197.0,   0, 0, 0, 0],
+                    		[1.0, 439.0 / 216.0, -8.0, 3680.0 / 513.0, -845.0 / 4104.0, 0, 0, 0],
+                    		[1.0 / 2.0, -8.0 / 27.0, 2.0, -3544.0 / 2565.0, 1859.0 / 4104.0, -11.0 / 40.0, 0],
+                    		[16.0 / 135.0, 0, 6656.0 / 12825.0, 28561.0 / 56430.0, -9.0 / 50.0, 2.0 / 55.0, 0, 0],
+                    		[25.0 / 216.0, 0, 1408.0 / 2565.0, 2197.0 / 4104.0, -1.0 / 5.0, 0, 0, 0]
+                          ]              
+                          )
+        
         
         return result
     
@@ -83,8 +97,6 @@ class Propagator(object):
                             stateVector[2]*coeff,
                            ]) 
         
-
-        
         return result;
     
     
@@ -122,6 +134,63 @@ class Propagator(object):
             for i in range(0, n):
                 ysum =  ysum + self.tableau_rk4[n,i]*kis[i]
 
+            yfinal =  yant + self.h*ysum
+            
+            self.stateVectors.append(yfinal)
+            
+            yant = yfinal;
+        
+        
+    def RK45(self, time, n):
+        """
+        RK4 hardcodeando las 4 derivaciones, sin uso de bucle
+        """
+            
+        
+        yant     = self.stateVector;
+        
+        
+        for t in range(0, time, self.h):
+            
+            
+            kimenosuno = self.__deriv(yant)
+            
+            yis = []
+            kis = []
+            
+            for i in range(0, n):
+                mult = self.tableau_rk4[i,i]
+                yi = yant + (mult*self.h)*kimenosuno
+                ki = self.__deriv(yi)
+                
+                #Se podria hacer todo en un paso pero por apredizaje
+                #y debug se abre
+                kis.append(ki)
+                yis.append(yi)
+                
+                kimenosuno = ki
+                
+            ysum = [0,0,0,0,0,0]
+            
+            #ymasuno = ymasuno + f_euler (tn [i][0], yn.column (i)) * h * tableau_rk4 [order][i];
+            for i in range(0, n):
+                ysum =  ysum + self.tableau_rk4[n,i]*kis[i]
+                #calculate ysum for rkf45
+                ysum_45 = ysum + self.tableau_rkf45[n-1,i]*kis[i]
+            
+            
+            yrest = ysum_45 - ysum
+            
+            yrest_mod = linalg.norm(yrest)
+            
+            if yrest_mod > 5:
+                yres_mod = (yrest_mod) * 5
+            else:
+                yrest_mod < 0.2:
+                    yres_mod = yres_mod * 0.2
+    
+                        
+            
             yfinal =  yant + self.h*ysum
             
             self.stateVectors.append(yfinal)

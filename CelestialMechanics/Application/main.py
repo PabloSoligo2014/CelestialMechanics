@@ -1,3 +1,5 @@
+ #!/usr/bin/python
+ # -*- coding:UTF-8 -*-
 '''
 Created on 24 de oct. de 2016
 
@@ -90,7 +92,8 @@ if __name__ == '__main__':
     p = Propagator.create(sv, 100)
     
     #p.RK4(94000)
-    p.RKN(94000, 4)
+    #p.RKN(94000, 4)
+    p.RK45(9400, 6)
     
     
     p.plot()
