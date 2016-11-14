@@ -1,3 +1,6 @@
+ #!/usr/bin/python
+ # -*- coding:UTF-8 -*-
+
 '''
 Created on 24 de oct. de 2016
 
