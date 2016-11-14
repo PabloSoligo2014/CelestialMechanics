@@ -79,6 +79,11 @@ def ej2():
     
     #Cambio de inclinacion en el apageo
     
+    
+    
+    
+
+
 
 if __name__ == '__main__':
     
@@ -88,7 +93,7 @@ if __name__ == '__main__':
     
     #p.RK4(94000)
     #p.RKN(94000, 4)
-    p.RK45(9400, 7, 1e-7)
+    p.RK45(9400, 8, 1e-7)
     
     
     p.plot()
