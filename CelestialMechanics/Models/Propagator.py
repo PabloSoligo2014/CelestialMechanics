@@ -165,26 +165,24 @@ class Propagator(object):
             
             
             #Recorro las filas de la tabla
-            for i in range(0, n-2):
-         
-                kn = kn + [yant]
-                
+            for i in range(0, n):
+                kn.append(yant)
                 #Recorro por columna
                 for j in range(0, n):
-                    
                     if self.tableau_rkf45[i ,j + 1] != 0:
                         a = self.tableau_rkf45[i,j + 1]
-                        f =  self.__deriv(kn[i]) * a * self.h
-                        kn[i] = kn[i] + f
+                        f =  self.__deriv(kn[j]) * a * self.h
+                        print f
+                        kn[j] = kn[j] + f
                         
                 
-            ysum = [0,0,0,0,0,0]
-            ysum_45 = [0,0,0,0,0,0]
+            ysum = yant
+            ysum_45 = yant
             #ymasuno = ymasuno + f_euler (tn [i][0], yn.column (i)) * h * tableau_rk4 [order][i];
-            for i in range(0, n-2):
+            for i in range(0, n):
                 ysum =  ysum + self.tableau_rkf45[n,i]*kn[i]
                 #calculate ysum for rkf45
-                ysum_45 = ysum_45 + self.tableau_rkf45[n-1,i]*kn[i]
+                ysum_45 = ysum_45 + self.tableau_rkf45[n+1,i]*kn[i]
 
             #Calculate s            
             s = 0.0
