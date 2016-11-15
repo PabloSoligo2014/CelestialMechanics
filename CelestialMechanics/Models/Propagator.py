@@ -141,42 +141,50 @@ class Propagator(object):
         
         
     def RK45(self, time, n, epsilon):
-        """
-        RK4 hardcodeando las 4 derivaciones, sin uso de bucle
-        """
-        print ("hola")
-        yant     = self.stateVector;
+        """RKF45
         
-        h = 100
-        #print(self.tableau_rkf45[0,0])
+        Parameters
+        ----------
+        
+        
+        """
+        
+        yant = self.stateVector;
+        
+        self.h = 100
+        #recorro desde desde un tiempo inicial a un tiempo final
         for t in range(0, time, self.h):
+            #kimenosuno = self.__deriv(yant)
+            #Inicializo vectores a utilizar
+            yis = np.array([])
+            kis = np.array([])
+            sum = np.array([])   
+            f = np.array([])         
+            #matriz para guardar los k intermedios
+            kn = []
             
             
-            kimenosuno = self.__deriv(yant)
-            
-            yis = []
-            kis = []
-            
-            for i in range(0, n):
-            
-                mult = self.tableau_rkf45[i,i]
-                yi = yant + (mult*self.h)*kimenosuno
-                ki = self.__deriv(yi)
+            #Recorro las filas de la tabla
+            for i in range(0, n-2):
+         
+                kn = kn + [yant]
                 
-                #Se podria hacer todo en un paso pero por apredizaje
-                #y debug se abre
-                kis.append(ki)
-                yis.append(yi)
-                
-                kimenosuno = ki
+                #Recorro por columna
+                for j in range(0, n):
+                    
+                    if self.tableau_rkf45[i ,j + 1] != 0:
+                        a = self.tableau_rkf45[i,j + 1]
+                        f =  self.__deriv(kn[i]) * a * self.h
+                        kn[i] = kn[i] + f
+                        
                 
             ysum = [0,0,0,0,0,0]
             ysum_45 = [0,0,0,0,0,0]
             #ymasuno = ymasuno + f_euler (tn [i][0], yn.column (i)) * h * tableau_rk4 [order][i];
-            for i in range(0, n):
-                ysum =  ysum + self.tableau_rkf45[n,i]*kis[i]
+            for i in range(0, n-2):
+                ysum =  ysum + self.tableau_rkf45[n,i]*kn[i]
                 #calculate ysum for rkf45
-                ysum_45 = ysum_45 + self.tableau_rkf45[n-1,i]*kis[i]
+                ysum_45 = ysum_45 + self.tableau_rkf45[n-1,i]*kn[i]
 
             #Calculate s            
             s = 0.0
@@ -201,7 +209,7 @@ class Propagator(object):
             self.stateVectors.append(yfinal)
             
             yant = yfinal;
-            h = h * s
+            self.h = self.h * s
             
         
         
