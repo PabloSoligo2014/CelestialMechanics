@@ -151,9 +151,11 @@ class Propagator(object):
         
         yant = self.stateVector;
         
-        self.h = 100
+        self.h = 100.0
+        contador = 0
         #recorro desde desde un tiempo inicial a un tiempo final
-        for t in range(0, time, self.h):
+        #for t in xrange(0, time,self.h):
+        for t in np.arange(0, time, self.h):
             #kimenosuno = self.__deriv(yant)
             #Inicializo vectores a utilizar
             yis = np.array([])
@@ -171,26 +173,35 @@ class Propagator(object):
                 for j in range(0, n):
                     if self.tableau_rkf45[i ,j + 1] != 0:
                         a = self.tableau_rkf45[i,j + 1]
-                        f =  self.__deriv(kn[j]) * a * self.h
-                        print f
-                        kn[j] = kn[j] + f
-                        
+                        f =  self.__deriv(kn[i]) * a * self.h
+                        kn[i] = kn[i] + f
                 
+                        
             ysum = yant
             ysum_45 = yant
             #ymasuno = ymasuno + f_euler (tn [i][0], yn.column (i)) * h * tableau_rk4 [order][i];
-            for i in range(0, n):
-                ysum =  ysum + self.tableau_rkf45[n,i]*kn[i]
+            for i in range(0, n): 
+                ysum =  ysum + self.__deriv(kn[i]) * self.tableau_rkf45[n+1,i] * self.h
+              
                 #calculate ysum for rkf45
-                ysum_45 = ysum_45 + self.tableau_rkf45[n+1,i]*kn[i]
+                ysum_45 = ysum_45 + self.__deriv(kn[i]) * self.tableau_rkf45[n,i]* self.h
 
+                
             #Calculate s            
             s = 0.0
             #Recta vectorial
-            aux = ysum_45 - ysum
+            print ysum_45
+            exit()
+            aux = ysum - ysum_45
+            
             #modulo de aux
             aux1 = np.linalg.norm(aux)
+            print aux1
+            print epsilon
             aux1 = epsilon / aux1
+            
+            print aux1
+            exit()
             
             s = 0.84 * (aux1 ** (0.25))
             
@@ -202,12 +213,17 @@ class Propagator(object):
             
             #end caclulate s
             
-            yfinal =  yant + self.h*ysum
+            #yfinal =  yant + self.h*ysum
             
-            self.stateVectors.append(yfinal)
+            self.stateVectors.append(ysum)
             
-            yant = yfinal;
+            yant = ysum;
             self.h = self.h * s
+            
+            print contador
+            contador +=1
+            
+            
             
         
         

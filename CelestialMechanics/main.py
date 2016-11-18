@@ -31,14 +31,13 @@ def ej1():
     semieje = (rapogeo+rperigeo)/2.0    
     
     
-     
+  
     #Terminar...    
     vapogeo = sqrt(mu*(2/rapogeo - 1/semieje));
     vperigeo = sqrt(mu*(2/rperigeo - 1/semieje));
     
     #Para calcular el deltav debo usar formula con semieje...
-    
-    
+        
     print("Velocidades: ", vapogeo, vperigeo)
     
     vfinal = sqrt(mu*(2/rapogeo - 1/rapogeo));
@@ -93,7 +92,7 @@ if __name__ == '__main__':
     
     #p.RK4(94000)
     #p.RKN(94000, 4)
-    p.RK45(9400, 6, 1e-7)
+    p.RK45(86400, 6, 1e-7)
     
     
     p.plot()
