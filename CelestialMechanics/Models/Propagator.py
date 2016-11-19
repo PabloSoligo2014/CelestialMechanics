@@ -152,10 +152,11 @@ class Propagator(object):
         yant = self.stateVector;
         
         self.h = 100.0
-        contador = 0
+        t = 0.0
         #recorro desde desde un tiempo inicial a un tiempo final
         #for t in xrange(0, time,self.h):
-        for t in np.arange(0, time, self.h):
+        #for t in np.arange(0, time, self.h):
+        while t < time:
             #kimenosuno = self.__deriv(yant)
             #Inicializo vectores a utilizar
             yis = np.array([])
@@ -164,8 +165,7 @@ class Propagator(object):
             f = np.array([])         
             #matriz para guardar los k intermedios
             kn = []
-            
-            
+              
             #Recorro las filas de la tabla
             for i in range(0, n):
                 kn.append(yant)
@@ -190,18 +190,15 @@ class Propagator(object):
             #Calculate s            
             s = 0.0
             #Recta vectorial
-            print ysum_45
-            exit()
+            
+        
             aux = ysum - ysum_45
             
             #modulo de aux
             aux1 = np.linalg.norm(aux)
-            print aux1
-            print epsilon
+           
             aux1 = epsilon / aux1
             
-            print aux1
-            exit()
             
             s = 0.84 * (aux1 ** (0.25))
             
@@ -220,10 +217,8 @@ class Propagator(object):
             yant = ysum;
             self.h = self.h * s
             
-            print contador
-            contador +=1
-            
-            
+            t = t + self.h
+           
             
         
         
